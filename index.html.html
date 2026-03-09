@@ -1,0 +1,1550 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Navigating Difficult Conversations | eLearning Module</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0f0e17;
+    --surface: #1a1927;
+    --surface2: #252438;
+    --accent: #e8c547;
+    --accent2: #ff6b6b;
+    --accent3: #6bcfff;
+    --text: #fffffe;
+    --text-muted: #a7a9be;
+    --correct: #4caf7d;
+    --wrong: #e05c5c;
+    --border: rgba(255,255,255,0.08);
+    --glow: rgba(232,197,71,0.15);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* GRAIN OVERLAY */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 1000;
+    opacity: 0.6;
+  }
+
+  /* ─── SCREENS ─── */
+  .screen { display: none; min-height: 100vh; }
+  .screen.active { display: flex; flex-direction: column; }
+
+  /* ─── HEADER ─── */
+  header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 48px;
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    background: rgba(15,14,23,0.92);
+    backdrop-filter: blur(16px);
+    z-index: 100;
+  }
+
+  .logo {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent);
+    opacity: 0.8;
+  }
+
+  .progress-bar-wrap {
+    flex: 1;
+    max-width: 400px;
+    margin: 0 32px;
+    height: 3px;
+    background: var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  .progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--accent3));
+    border-radius: 4px;
+    transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    width: 0%;
+  }
+
+  .step-label {
+    font-size: 12px;
+    color: var(--text-muted);
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+  }
+
+  /* ─── TITLE SCREEN ─── */
+  #screen-intro {
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .intro-bg {
+    position: absolute;
+    inset: 0;
+    background: 
+      radial-gradient(ellipse 80% 60% at 50% 0%, rgba(232,197,71,0.08) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 50% at 20% 100%, rgba(107,207,255,0.06) 0%, transparent 50%),
+      radial-gradient(ellipse 50% 40% at 80% 50%, rgba(255,107,107,0.05) 0%, transparent 50%);
+  }
+
+  .intro-content {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    max-width: 720px;
+    padding: 48px 32px;
+    animation: fadeUp 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(32px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .module-tag {
+    display: inline-block;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--accent);
+    border: 1px solid rgba(232,197,71,0.3);
+    padding: 6px 16px;
+    border-radius: 2px;
+    margin-bottom: 32px;
+  }
+
+  .intro-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(40px, 6vw, 72px);
+    font-weight: 900;
+    line-height: 1.05;
+    margin-bottom: 24px;
+    background: linear-gradient(135deg, #fffffe 40%, var(--accent) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .intro-sub {
+    font-size: 17px;
+    color: var(--text-muted);
+    line-height: 1.7;
+    margin-bottom: 40px;
+    font-weight: 300;
+  }
+
+  .objectives-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 28px 32px;
+    text-align: left;
+    margin-bottom: 40px;
+  }
+
+  .objectives-box h3 {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 16px;
+  }
+
+  .objectives-box ul {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .objectives-box li {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    font-size: 14px;
+    color: var(--text-muted);
+    line-height: 1.5;
+  }
+
+  .objectives-box li::before {
+    content: '→';
+    color: var(--accent);
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    margin-top: 1px;
+    flex-shrink: 0;
+  }
+
+  /* ─── BUTTONS ─── */
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--accent);
+    color: #0f0e17;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    padding: 16px 36px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-transform: uppercase;
+  }
+
+  .btn-primary:hover {
+    background: #f0d060;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 32px rgba(232,197,71,0.3);
+  }
+
+  .btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: transparent;
+    color: var(--text-muted);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    padding: 14px 28px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .btn-secondary:hover {
+    border-color: rgba(255,255,255,0.25);
+    color: var(--text);
+    background: rgba(255,255,255,0.04);
+  }
+
+  /* ─── SCENARIO SCREENS ─── */
+  .scenario-layout {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    min-height: calc(100vh - 65px);
+  }
+
+  .scene-visual {
+    position: relative;
+    overflow: hidden;
+    background: var(--surface);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 48px;
+  }
+
+  .scene-bg-gradient {
+    position: absolute;
+    inset: 0;
+  }
+
+  .scene-illustration {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+  }
+
+  /* SVG ILLUSTRATIONS */
+  .character-wrap {
+    width: 220px;
+    height: 220px;
+    margin: 0 auto 24px;
+    position: relative;
+  }
+
+  .speech-bubble {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 16px 20px;
+    font-size: 14px;
+    color: var(--text);
+    line-height: 1.6;
+    position: relative;
+    max-width: 280px;
+    margin: 0 auto;
+    animation: popIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) 0.3s both;
+  }
+
+  @keyframes popIn {
+    from { opacity: 0; transform: scale(0.8) translateY(8px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+  }
+
+  .speech-bubble::before {
+    content: '';
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 5px solid transparent;
+    border-bottom-color: var(--border);
+  }
+
+  .scene-panel {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 56px 56px;
+    background: var(--bg);
+    overflow-y: auto;
+  }
+
+  .scene-context {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 12px;
+    opacity: 0.8;
+  }
+
+  .scene-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(24px, 3vw, 36px);
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 20px;
+  }
+
+  .scene-body {
+    font-size: 15px;
+    color: var(--text-muted);
+    line-height: 1.75;
+    margin-bottom: 36px;
+  }
+
+  .scene-body strong {
+    color: var(--text);
+    font-weight: 600;
+  }
+
+  /* ─── CHOICES ─── */
+  .choices-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 16px;
+  }
+
+  .choices {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 32px;
+  }
+
+  .choice-btn {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 18px 20px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: left;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    line-height: 1.55;
+  }
+
+  .choice-btn:hover:not(:disabled) {
+    border-color: rgba(232,197,71,0.4);
+    background: var(--surface2);
+    transform: translateX(4px);
+  }
+
+  .choice-btn:disabled { cursor: default; pointer-events: none; }
+
+  .choice-letter {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--accent);
+    background: rgba(232,197,71,0.1);
+    border-radius: 4px;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .choice-btn.correct {
+    border-color: var(--correct);
+    background: rgba(76,175,125,0.08);
+  }
+
+  .choice-btn.correct .choice-letter {
+    color: var(--correct);
+    background: rgba(76,175,125,0.15);
+  }
+
+  .choice-btn.wrong {
+    border-color: var(--wrong);
+    background: rgba(224,92,92,0.08);
+    opacity: 0.6;
+  }
+
+  .choice-btn.wrong .choice-letter {
+    color: var(--wrong);
+    background: rgba(224,92,92,0.15);
+  }
+
+  /* ─── FEEDBACK ─── */
+  .feedback-box {
+    border-radius: 8px;
+    padding: 20px 24px;
+    margin-bottom: 24px;
+    animation: slideIn 0.35s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    display: none;
+  }
+
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(-8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .feedback-box.show { display: block; }
+
+  .feedback-box.correct-fb {
+    background: rgba(76,175,125,0.1);
+    border: 1px solid rgba(76,175,125,0.3);
+  }
+
+  .feedback-box.wrong-fb {
+    background: rgba(224,92,92,0.08);
+    border: 1px solid rgba(224,92,92,0.25);
+  }
+
+  .feedback-heading {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    font-weight: 500;
+    margin-bottom: 8px;
+  }
+
+  .feedback-box.correct-fb .feedback-heading { color: var(--correct); }
+  .feedback-box.wrong-fb .feedback-heading { color: var(--wrong); }
+
+  .feedback-text {
+    font-size: 13px;
+    color: var(--text-muted);
+    line-height: 1.65;
+  }
+
+  .feedback-text strong { color: var(--text); }
+
+  /* ─── KNOWLEDGE CHECK ─── */
+  .kc-layout {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 48px 24px;
+    max-width: 720px;
+    margin: 0 auto;
+    width: 100%;
+    animation: fadeUp 0.5s ease forwards;
+  }
+
+  .kc-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--accent3);
+    margin-bottom: 8px;
+  }
+
+  .kc-question {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(20px, 2.5vw, 28px);
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 40px;
+    line-height: 1.35;
+  }
+
+  .kc-options {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+    margin-bottom: 32px;
+  }
+
+  .kc-option {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 18px 24px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    font-size: 14px;
+    color: var(--text-muted);
+    text-align: left;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  .kc-option:hover:not(:disabled) {
+    border-color: rgba(107,207,255,0.4);
+    color: var(--text);
+    background: var(--surface2);
+  }
+
+  .kc-option:disabled { cursor: default; pointer-events: none; }
+
+  .kc-option.correct {
+    border-color: var(--correct);
+    background: rgba(76,175,125,0.08);
+    color: var(--text);
+  }
+
+  .kc-option.wrong {
+    border-color: var(--wrong);
+    background: rgba(224,92,92,0.06);
+    opacity: 0.5;
+  }
+
+  .kc-radio {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    border: 2px solid var(--border);
+    flex-shrink: 0;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .kc-option.correct .kc-radio {
+    border-color: var(--correct);
+    background: var(--correct);
+  }
+
+  .kc-option.correct .kc-radio::after {
+    content: '✓';
+    font-size: 10px;
+    color: #0f0e17;
+    font-weight: 700;
+  }
+
+  .kc-option.wrong .kc-radio {
+    border-color: var(--wrong);
+    background: var(--wrong);
+  }
+
+  .kc-option.wrong .kc-radio::after {
+    content: '×';
+    font-size: 12px;
+    color: white;
+    font-weight: 700;
+  }
+
+  /* ─── RESULTS ─── */
+  #screen-results {
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .results-bg {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 70% 50% at 50% 100%, rgba(76,175,125,0.1) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 40% at 80% 20%, rgba(107,207,255,0.06) 0%, transparent 50%);
+  }
+
+  .results-content {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    max-width: 640px;
+    padding: 48px 32px;
+    animation: fadeUp 0.7s ease forwards;
+  }
+
+  .score-ring {
+    width: 140px;
+    height: 140px;
+    margin: 0 auto 32px;
+    position: relative;
+  }
+
+  .score-ring svg {
+    transform: rotate(-90deg);
+    width: 100%;
+    height: 100%;
+  }
+
+  .score-ring-text {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .score-number {
+    font-family: 'Playfair Display', serif;
+    font-size: 38px;
+    font-weight: 900;
+    color: var(--accent);
+    line-height: 1;
+  }
+
+  .score-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-top: 4px;
+  }
+
+  .results-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 36px;
+    font-weight: 700;
+    margin-bottom: 16px;
+  }
+
+  .results-msg {
+    font-size: 15px;
+    color: var(--text-muted);
+    line-height: 1.7;
+    margin-bottom: 40px;
+  }
+
+  .achievements {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 40px;
+  }
+
+  .badge {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px 20px;
+    text-align: center;
+    min-width: 120px;
+  }
+
+  .badge-icon {
+    font-size: 28px;
+    display: block;
+    margin-bottom: 8px;
+  }
+
+  .badge-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  .btn-row {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  /* ─── DIVIDER ─── */
+  .divider {
+    width: 40px;
+    height: 2px;
+    background: var(--accent);
+    margin: 0 0 28px;
+    opacity: 0.6;
+  }
+
+  /* ─── TOOLTIP / GLOSSARY ASIDE ─── */
+  .info-strip {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: rgba(107,207,255,0.07);
+    border: 1px solid rgba(107,207,255,0.15);
+    border-radius: 6px;
+    padding: 12px 16px;
+    margin-bottom: 24px;
+    font-size: 12px;
+    color: var(--text-muted);
+    line-height: 1.55;
+  }
+
+  .info-strip span.icon {
+    font-size: 16px;
+    flex-shrink: 0;
+    color: var(--accent3);
+  }
+
+  /* ─── PORTFOLIO WATERMARK ─── */
+  .portfolio-watermark {
+    position: fixed;
+    bottom: 20px;
+    right: 24px;
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.15em;
+    color: rgba(255,255,255,0.12);
+    text-transform: uppercase;
+    z-index: 50;
+  }
+
+  /* ─── RESPONSIVE ─── */
+  @media (max-width: 768px) {
+    header { padding: 16px 24px; }
+    .scenario-layout { grid-template-columns: 1fr; }
+    .scene-visual { min-height: 280px; padding: 32px; }
+    .scene-panel { padding: 36px 24px; }
+    .kc-layout { padding: 32px 20px; }
+    .intro-content { padding: 32px 20px; }
+  }
+
+  /* ─── TRANSITION ─── */
+  .screen-fade-enter {
+    animation: fadeIn 0.4s ease forwards;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+</style>
+</head>
+<body>
+
+<!-- PORTFOLIO WATERMARK -->
+<div class="portfolio-watermark">Portfolio Project · Instructional Design</div>
+
+<!-- ═══════════════════════════════════════
+     HEADER (shown on all screens except intro)
+     ═══════════════════════════════════════ -->
+<header id="main-header" style="display:none;">
+  <div class="logo">ID Portfolio</div>
+  <div class="progress-bar-wrap">
+    <div class="progress-bar-fill" id="progress-fill"></div>
+  </div>
+  <div class="step-label" id="step-label">Step 1 of 6</div>
+</header>
+
+<!-- ═══════════════════════════════════════
+     SCREEN 0 — INTRO
+     ═══════════════════════════════════════ -->
+<div class="screen active" id="screen-intro">
+  <div class="intro-bg"></div>
+  <div class="intro-content">
+    <div class="module-tag">Scenario-Based eLearning · Portfolio Module</div>
+    <h1 class="intro-title">Navigating<br>Difficult<br>Conversations</h1>
+    <p class="intro-sub">An interactive scenario for new managers learning to deliver constructive feedback with empathy and clarity.</p>
+    
+    <div class="objectives-box">
+      <h3>Learning Objectives</h3>
+      <ul>
+        <li>Identify the key principles of constructive feedback in the workplace</li>
+        <li>Choose the appropriate communication approach for a performance issue</li>
+        <li>Apply active listening techniques in a challenging management scenario</li>
+        <li>Recognise common mistakes managers make when giving feedback</li>
+      </ul>
+    </div>
+
+    <div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap;">
+      <button class="btn-primary" onclick="startModule()">
+        Begin Module &#8594;
+      </button>
+    </div>
+    <p style="margin-top:16px;font-size:12px;color:var(--text-muted);">Estimated time: 8–10 minutes &nbsp;·&nbsp; 1 scenario, 3 knowledge check questions</p>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     SCREEN 1 — SCENARIO SETUP
+     ═══════════════════════════════════════ -->
+<div class="screen" id="screen-s1">
+  <div class="scenario-layout">
+    <div class="scene-visual">
+      <div class="scene-bg-gradient" style="background: radial-gradient(ellipse 80% 80% at 50% 50%, rgba(255,107,107,0.07) 0%, transparent 70%);"></div>
+      <div class="scene-illustration">
+        <!-- SVG character: Jordan (employee) -->
+        <div class="character-wrap">
+          <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%;">
+            <!-- Background circle -->
+            <circle cx="100" cy="100" r="95" fill="#1a1927" stroke="rgba(255,107,107,0.2)" stroke-width="1.5"/>
+            <!-- Desk -->
+            <rect x="30" y="140" width="140" height="8" rx="2" fill="#252438"/>
+            <!-- Body/torso -->
+            <rect x="70" y="100" width="60" height="55" rx="8" fill="#2d2b45"/>
+            <!-- Collar -->
+            <path d="M85 100 L100 115 L115 100" stroke="#6bcfff" stroke-width="2" fill="none"/>
+            <!-- Head -->
+            <circle cx="100" cy="80" r="26" fill="#c8a882"/>
+            <!-- Hair -->
+            <ellipse cx="100" cy="57" rx="26" ry="10" fill="#3d2b1e"/>
+            <!-- Eyes (frustrated) -->
+            <path d="M88 76 Q91 73 94 76" stroke="#3d2b1e" stroke-width="2" fill="none" stroke-linecap="round"/>
+            <path d="M106 76 Q109 73 112 76" stroke="#3d2b1e" stroke-width="2" fill="none" stroke-linecap="round"/>
+            <!-- Mouth (tense) -->
+            <path d="M93 87 Q100 84 107 87" stroke="#9a7560" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+            <!-- Arms on desk -->
+            <ellipse cx="72" cy="140" rx="14" ry="8" fill="#2d2b45"/>
+            <ellipse cx="128" cy="140" rx="14" ry="8" fill="#2d2b45"/>
+            <!-- Laptop on desk -->
+            <rect x="62" y="126" width="76" height="14" rx="3" fill="#1a1927" stroke="rgba(107,207,255,0.3)" stroke-width="1"/>
+            <rect x="65" y="128" width="70" height="10" rx="2" fill="#0f0e17"/>
+            <rect x="68" y="130" width="50" height="6" rx="1" fill="#1e4060" opacity="0.8"/>
+          </svg>
+        </div>
+        <div class="speech-bubble">
+          "I don't understand why my numbers are always getting criticised. I work really hard."
+        </div>
+        <p style="margin-top:16px;font-size:11px;color:var(--text-muted);font-family:'DM Mono',monospace;letter-spacing:0.1em;text-transform:uppercase;">Jordan — Sales Associate, 18 months</p>
+      </div>
+    </div>
+
+    <div class="scene-panel">
+      <div class="scene-context">Scene 1 of 3 · Setup</div>
+      <div class="divider"></div>
+      <h2 class="scene-title">The Situation</h2>
+      <p class="scene-body">
+        It's Monday morning. You're a new manager at a mid-size software company, three months into your role.<br><br>
+        <strong>Jordan</strong>, one of your direct reports, has missed their monthly sales targets for the second consecutive month. You've called a one-on-one meeting to address the performance issue.<br><br>
+        Jordan walks in looking defensive. Before you can say a word, they say: <em>"I already know what this is about, and I think it's unfair."</em>
+      </p>
+
+      <div class="info-strip">
+        <span class="icon">💡</span>
+        <span>Research shows that <strong>the opening 60 seconds</strong> of a feedback conversation determine whether the employee feels judged or supported. Your first response matters most.</span>
+      </div>
+
+      <p class="choices-label">How do you respond?</p>
+      <div class="choices" id="choices-s1">
+        <button class="choice-btn" onclick="chooseS1('A')">
+          <span class="choice-letter">A</span>
+          "Jordan, I set this meeting because I have concerns about your numbers. Let's look at the data together."
+        </button>
+        <button class="choice-btn" onclick="chooseS1('B')">
+          <span class="choice-letter">B</span>
+          "I hear you — that sounds frustrating. Can you tell me a bit more about how you've been feeling about your work lately?"
+        </button>
+        <button class="choice-btn" onclick="chooseS1('C')">
+          <span class="choice-letter">C</span>
+          "Jordan, missing your targets twice in a row is a serious issue and we need to talk about consequences."
+        </button>
+      </div>
+
+      <div class="feedback-box" id="fb-s1"></div>
+
+      <button class="btn-primary" id="next-s1" style="display:none;" onclick="goTo('screen-s2')">
+        Continue &#8594;
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     SCREEN 2 — SCENARIO MIDDLE
+     ═══════════════════════════════════════ -->
+<div class="screen" id="screen-s2">
+  <div class="scenario-layout">
+    <div class="scene-visual">
+      <div class="scene-bg-gradient" style="background: radial-gradient(ellipse 80% 80% at 50% 50%, rgba(232,197,71,0.06) 0%, transparent 70%);"></div>
+      <div class="scene-illustration">
+        <div class="character-wrap">
+          <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%;">
+            <circle cx="100" cy="100" r="95" fill="#1a1927" stroke="rgba(232,197,71,0.2)" stroke-width="1.5"/>
+            <!-- Desk -->
+            <rect x="30" y="140" width="140" height="8" rx="2" fill="#252438"/>
+            <!-- Body -->
+            <rect x="70" y="100" width="60" height="55" rx="8" fill="#2d3a4a"/>
+            <!-- Collar/tie -->
+            <path d="M93 100 L100 108 L107 100" stroke="#e8c547" stroke-width="2" fill="none"/>
+            <path d="M100 108 L100 118" stroke="#e8c547" stroke-width="1.5"/>
+            <!-- Head - YOU (the manager) -->
+            <circle cx="100" cy="80" r="26" fill="#d4a574"/>
+            <!-- Hair -->
+            <ellipse cx="100" cy="56" rx="26" ry="9" fill="#2a2a2a"/>
+            <!-- Eyes (engaged, slightly concerned) -->
+            <circle cx="91" cy="77" r="3.5" fill="#3d2b1e"/>
+            <circle cx="109" cy="77" r="3.5" fill="#3d2b1e"/>
+            <circle cx="92" cy="76" r="1.2" fill="white"/>
+            <circle cx="110" cy="76" r="1.2" fill="white"/>
+            <!-- Eyebrows (concerned) -->
+            <path d="M87 71 Q91 69 95 71" stroke="#3d2b1e" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+            <path d="M105 71 Q109 69 113 71" stroke="#3d2b1e" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+            <!-- Mouth (listening) -->
+            <path d="M93 88 Q100 90 107 88" stroke="#9a7560" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+            <!-- Arms -->
+            <ellipse cx="72" cy="140" rx="14" ry="8" fill="#2d3a4a"/>
+            <ellipse cx="128" cy="140" rx="14" ry="8" fill="#2d3a4a"/>
+            <!-- Notepad -->
+            <rect x="64" y="126" width="72" height="14" rx="3" fill="#1a1927" stroke="rgba(232,197,71,0.3)" stroke-width="1"/>
+            <line x1="70" y1="131" x2="110" y2="131" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+            <line x1="70" y1="135" x2="100" y2="135" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+          </svg>
+        </div>
+        <div class="speech-bubble">
+          You lean forward slightly, nodding. Jordan pauses, then begins to open up...
+        </div>
+        <p style="margin-top:16px;font-size:11px;color:var(--text-muted);font-family:'DM Mono',monospace;letter-spacing:0.1em;text-transform:uppercase;">You — Manager, 3 months in</p>
+      </div>
+    </div>
+
+    <div class="scene-panel">
+      <div class="scene-context">Scene 2 of 3 · Discovery</div>
+      <div class="divider"></div>
+      <h2 class="scene-title">A New Detail Emerges</h2>
+      <p class="scene-body">
+        After you invite Jordan to share their perspective, they reveal something unexpected:<br><br>
+        <em>"I've been struggling with the new CRM system. My previous manager said they'd arrange training but it never happened. I've been winging it for months — and honestly I'm embarrassed to ask for help."</em><br><br>
+        This is new information. Jordan's poor performance may be a <strong>skills gap</strong>, not a <strong>motivation problem</strong> — a crucial distinction for how you proceed.
+      </p>
+
+      <div class="info-strip">
+        <span class="icon">📚</span>
+        <span>The <strong>ADDIE model</strong> reminds us to always <em>analyse</em> before designing a solution. Jumping to consequences without understanding root cause is one of the most common management errors.</span>
+      </div>
+
+      <p class="choices-label">What's your next move?</p>
+      <div class="choices" id="choices-s2">
+        <button class="choice-btn" onclick="chooseS2('A')">
+          <span class="choice-letter">A</span>
+          "That's not an excuse — you should have raised this sooner. The targets still need to be met."
+        </button>
+        <button class="choice-btn" onclick="chooseS2('B')">
+          <span class="choice-letter">B</span>
+          "Thank you for telling me. Let's figure out what support you need and build a proper plan together."
+        </button>
+        <button class="choice-btn" onclick="chooseS2('C')">
+          <span class="choice-letter">C</span>
+          "That's really not fair on you — I'll escalate this to HR immediately about your previous manager."
+        </button>
+      </div>
+
+      <div class="feedback-box" id="fb-s2"></div>
+
+      <button class="btn-primary" id="next-s2" style="display:none;" onclick="goTo('screen-s3')">
+        Continue &#8594;
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     SCREEN 3 — SCENARIO RESOLUTION
+     ═══════════════════════════════════════ -->
+<div class="screen" id="screen-s3">
+  <div class="scenario-layout">
+    <div class="scene-visual">
+      <div class="scene-bg-gradient" style="background: radial-gradient(ellipse 80% 80% at 50% 50%, rgba(76,175,125,0.08) 0%, transparent 70%);"></div>
+      <div class="scene-illustration">
+        <div class="character-wrap">
+          <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%;">
+            <circle cx="100" cy="100" r="95" fill="#1a1927" stroke="rgba(76,175,125,0.25)" stroke-width="1.5"/>
+            <!-- Two people at a table (side by side) -->
+            <rect x="30" y="145" width="140" height="8" rx="2" fill="#252438"/>
+            <!-- Person 1 body (Jordan, now calmer) -->
+            <rect x="45" y="108" width="42" height="45" rx="6" fill="#2d2b45"/>
+            <!-- Person 1 head -->
+            <circle cx="66" cy="92" r="19" fill="#c8a882"/>
+            <ellipse cx="66" cy="75" rx="19" ry="7" fill="#3d2b1e"/>
+            <!-- Person 1 eyes (relieved) -->
+            <path d="M60 89 Q63 91 66 89" stroke="#3d2b1e" stroke-width="1.5" fill="none"/>
+            <path d="M66 89 Q69 91 72 89" stroke="#3d2b1e" stroke-width="1.5" fill="none"/>
+            <!-- Person 2 body (You) -->
+            <rect x="113" y="108" width="42" height="45" rx="6" fill="#2d3a4a"/>
+            <!-- Person 2 head -->
+            <circle cx="134" cy="92" r="19" fill="#d4a574"/>
+            <ellipse cx="134" cy="75" rx="19" ry="7" fill="#2a2a2a"/>
+            <!-- Person 2 eyes (warm) -->
+            <circle cx="127" cy="89" r="3" fill="#3d2b1e"/>
+            <circle cx="141" cy="89" r="3" fill="#3d2b1e"/>
+            <!-- Person 2 smile -->
+            <path d="M128 96 Q134 99 140 96" stroke="#9a7560" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+            <!-- Shared notepad -->
+            <rect x="72" y="138" width="56" height="12" rx="3" fill="#252438" stroke="rgba(76,175,125,0.3)" stroke-width="1"/>
+            <line x1="78" y1="143" x2="120" y2="143" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
+            <!-- Check mark / plan -->
+            <path d="M82 147 L86 151 L94 143" stroke="#4caf7d" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="speech-bubble">
+          Jordan leaves the meeting looking visibly lighter. You've agreed on a 30-day support plan.
+        </div>
+        <p style="margin-top:16px;font-size:11px;color:var(--text-muted);font-family:'DM Mono',monospace;letter-spacing:0.1em;text-transform:uppercase;">Scene — Post-conversation</p>
+      </div>
+    </div>
+
+    <div class="scene-panel">
+      <div class="scene-context">Scene 3 of 3 · Resolution</div>
+      <div class="divider"></div>
+      <h2 class="scene-title">Closing the Loop</h2>
+      <p class="scene-body">
+        The conversation has gone well. Jordan now has a training plan in place, and feels heard. You have one more decision to make: how do you end this meeting?<br><br>
+        This moment defines whether Jordan walks out feeling <strong>accountable and supported</strong> — or like this was purely a disciplinary exercise.
+      </p>
+
+      <div class="info-strip">
+        <span class="icon">🎯</span>
+        <span>Effective feedback ends with <strong>mutual agreement</strong> on next steps and a clear sense of follow-up. Vague endings erode trust and accountability.</span>
+      </div>
+
+      <p class="choices-label">How do you close the meeting?</p>
+      <div class="choices" id="choices-s3">
+        <button class="choice-btn" onclick="chooseS3('A')">
+          <span class="choice-letter">A</span>
+          "Great chat. Let's see how you get on and circle back in a few weeks."
+        </button>
+        <button class="choice-btn" onclick="chooseS3('B')">
+          <span class="choice-letter">B</span>
+          "Let's write down our agreed actions before you go, and I'll book a check-in for two weeks' time. Sound good?"
+        </button>
+        <button class="choice-btn" onclick="chooseS3('C')">
+          <span class="choice-letter">C</span>
+          "I'll email you a summary of what we discussed and copy in HR for documentation purposes."
+        </button>
+      </div>
+
+      <div class="feedback-box" id="fb-s3"></div>
+
+      <button class="btn-primary" id="next-s3" style="display:none;" onclick="goTo('screen-kc')">
+        Knowledge Check &#8594;
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     SCREEN KC — KNOWLEDGE CHECK
+     ═══════════════════════════════════════ -->
+<div class="screen" id="screen-kc">
+  <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;">
+    <!-- KC1 -->
+    <div class="kc-layout screen-fade-enter" id="kc1" style="display:flex;">
+      <div class="kc-tag">Knowledge Check · Question 1 of 3</div>
+      <h2 class="kc-question">What is the PRIMARY purpose of asking open questions at the start of a feedback conversation?</h2>
+      <div class="kc-options">
+        <button class="kc-option" onclick="answerKC(1,'A','wrong')">
+          <div class="kc-radio"></div>
+          To buy time while you organise your notes
+        </button>
+        <button class="kc-option" onclick="answerKC(1,'B','correct')">
+          <div class="kc-radio"></div>
+          To understand the employee's perspective before making assumptions
+        </button>
+        <button class="kc-option" onclick="answerKC(1,'C','wrong')">
+          <div class="kc-radio"></div>
+          To let the employee incriminate themselves before you present evidence
+        </button>
+        <button class="kc-option" onclick="answerKC(1,'D','wrong')">
+          <div class="kc-radio"></div>
+          To demonstrate your communication skills to HR
+        </button>
+      </div>
+      <div class="feedback-box" id="fb-kc1"></div>
+      <button class="btn-primary" id="next-kc1" style="display:none;" onclick="showKC(2)">Next Question &#8594;</button>
+    </div>
+
+    <!-- KC2 -->
+    <div class="kc-layout" id="kc2" style="display:none;">
+      <div class="kc-tag">Knowledge Check · Question 2 of 3</div>
+      <h2 class="kc-question">When a performance issue turns out to be a skills gap rather than a motivation problem, the correct response is to:</h2>
+      <div class="kc-options">
+        <button class="kc-option" onclick="answerKC(2,'A','wrong')">
+          <div class="kc-radio"></div>
+          Issue a formal written warning to create a paper trail
+        </button>
+        <button class="kc-option" onclick="answerKC(2,'B','wrong')">
+          <div class="kc-radio"></div>
+          Ignore it, as skills gaps are the employee's own responsibility
+        </button>
+        <button class="kc-option" onclick="answerKC(2,'C','correct')">
+          <div class="kc-radio"></div>
+          Co-create a development plan with appropriate training and support
+        </button>
+        <button class="kc-option" onclick="answerKC(2,'D','wrong')">
+          <div class="kc-radio"></div>
+          Reassign the work to a higher-performing team member
+        </button>
+      </div>
+      <div class="feedback-box" id="fb-kc2"></div>
+      <button class="btn-primary" id="next-kc2" style="display:none;" onclick="showKC(3)">Next Question &#8594;</button>
+    </div>
+
+    <!-- KC3 -->
+    <div class="kc-layout" id="kc3" style="display:none;">
+      <div class="kc-tag">Knowledge Check · Question 3 of 3</div>
+      <h2 class="kc-question">Which of the following BEST describes an effective way to close a difficult feedback meeting?</h2>
+      <div class="kc-options">
+        <button class="kc-option" onclick="answerKC(3,'A','wrong')">
+          <div class="kc-radio"></div>
+          End promptly without dwelling — the employee needs space to process
+        </button>
+        <button class="kc-option" onclick="answerKC(3,'B','correct')">
+          <div class="kc-radio"></div>
+          Confirm agreed actions together and schedule a follow-up check-in
+        </button>
+        <button class="kc-option" onclick="answerKC(3,'C','wrong')">
+          <div class="kc-radio"></div>
+          Remind them of the potential consequences if things don't improve
+        </button>
+        <button class="kc-option" onclick="answerKC(3,'D','wrong')">
+          <div class="kc-radio"></div>
+          Ask them to rate the conversation out of 10 before they leave
+        </button>
+      </div>
+      <div class="feedback-box" id="fb-kc3"></div>
+      <button class="btn-primary" id="next-kc3" style="display:none;" onclick="goResults()">View Results &#8594;</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     SCREEN RESULTS
+     ═══════════════════════════════════════ -->
+<div class="screen" id="screen-results">
+  <div class="results-bg"></div>
+  <div class="results-content">
+    <div class="score-ring">
+      <svg viewBox="0 0 140 140">
+        <circle cx="70" cy="70" r="60" stroke="rgba(255,255,255,0.06)" stroke-width="10" fill="none"/>
+        <circle cx="70" cy="70" r="60" stroke="url(#score-grad)" stroke-width="10" fill="none"
+          stroke-dasharray="377" stroke-dashoffset="377"
+          stroke-linecap="round" id="score-arc"/>
+        <defs>
+          <linearGradient id="score-grad" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stop-color="#e8c547"/>
+            <stop offset="100%" stop-color="#6bcfff"/>
+          </linearGradient>
+        </defs>
+      </svg>
+      <div class="score-ring-text">
+        <span class="score-number" id="score-display">0</span>
+        <span class="score-label">Score</span>
+      </div>
+    </div>
+
+    <h2 class="results-title" id="results-title">Well done!</h2>
+    <p class="results-msg" id="results-msg">You've completed the module.</p>
+
+    <div class="achievements">
+      <div class="badge">
+        <span class="badge-icon">🎧</span>
+        <div class="badge-label">Active Listener</div>
+      </div>
+      <div class="badge">
+        <span class="badge-icon">🔍</span>
+        <div class="badge-label">Root Cause</div>
+      </div>
+      <div class="badge" id="badge-3">
+        <span class="badge-icon">⭐</span>
+        <div class="badge-label">Module Complete</div>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn-primary" onclick="restartModule()">&#8634; Restart Module</button>
+      <button class="btn-secondary" onclick="showDesignNotes()">View Design Notes</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     SCREEN DESIGN NOTES
+     ═══════════════════════════════════════ -->
+<div class="screen" id="screen-notes">
+  <div style="flex:1;max-width:800px;margin:0 auto;padding:56px 32px;animation:fadeUp 0.5s ease forwards;">
+    <div class="module-tag">Portfolio Documentation</div>
+    <h2 style="font-family:'Playfair Display',serif;font-size:36px;font-weight:700;margin:20px 0 32px;line-height:1.2;">Design Notes &amp; Rationale</h2>
+
+    <div style="display:flex;flex-direction:column;gap:28px;">
+
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:28px;">
+        <h3 style="font-family:'DM Mono',monospace;font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:var(--accent);margin-bottom:12px;">Instructional Strategy</h3>
+        <p style="font-size:14px;color:var(--text-muted);line-height:1.75;">This module uses <strong style="color:var(--text);">scenario-based learning</strong> (SBL) to place learners in realistic situations where choices have consequences. Rather than presenting facts directly, the learner discovers principles through decision-making. This approach is grounded in Merrill's First Principles of Instruction and supports <strong style="color:var(--text);">transfer of learning</strong> to real workplace situations.</p>
+      </div>
+
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:28px;">
+        <h3 style="font-family:'DM Mono',monospace;font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:var(--accent3);margin-bottom:12px;">ADDIE Framework</h3>
+        <p style="font-size:14px;color:var(--text-muted);line-height:1.75;">
+          <strong style="color:var(--text);">Analyse:</strong> Target audience = new managers (0–6 months in role). Performance gap = poor feedback delivery skills.<br><br>
+          <strong style="color:var(--text);">Design:</strong> 3-scene branching scenario + 3-question knowledge check. Bloom's Taxonomy levels: Apply and Analyse.<br><br>
+          <strong style="color:var(--text);">Develop:</strong> Built as single-file HTML/CSS/JS, simulating an Articulate Storyline-style deliverable. SVG characters created without stock imagery.<br><br>
+          <strong style="color:var(--text);">Implement:</strong> Delivered via browser, no LMS required for portfolio review.<br><br>
+          <strong style="color:var(--text);">Evaluate:</strong> Knowledge check provides immediate formative data; score displayed at completion.
+        </p>
+      </div>
+
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:28px;">
+        <h3 style="font-family:'DM Mono',monospace;font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:var(--accent2);margin-bottom:12px;">AI Tools Used</h3>
+        <p style="font-size:14px;color:var(--text-muted);line-height:1.75;">This project demonstrates <strong style="color:var(--text);">AI fluency</strong> as a core ID competency. Claude AI was used to: draft initial scenario scripts and dialogue, suggest branching logic, generate feedback copy for each choice, and refine the learning objectives. The designer then edited, structured, and coded the final deliverable — demonstrating the <em>one-person team</em> model of modern instructional design.</p>
+      </div>
+
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:28px;">
+        <h3 style="font-family:'DM Mono',monospace;font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:var(--correct);margin-bottom:12px;">Portfolio Value</h3>
+        <p style="font-size:14px;color:var(--text-muted);line-height:1.75;">This module functions as a <strong style="color:var(--text);">flagship portfolio piece</strong>: it solves a real organisational problem (new manager onboarding), demonstrates end-to-end ID thinking (ADDIE), and shows technical execution (interactive eLearning). The topic was chosen because every corporate organisation has managers, making this highly relevant to any hiring manager across industries.</p>
+      </div>
+    </div>
+
+    <div style="margin-top:40px;text-align:center;">
+      <button class="btn-primary" onclick="goTo('screen-results')">&#8592; Back to Results</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     JAVASCRIPT
+     ═══════════════════════════════════════ -->
+<script>
+  // ─── STATE ───
+  let score = 0;
+  let kcCorrect = 0;
+  const screens = ['screen-intro','screen-s1','screen-s2','screen-s3','screen-kc','screen-results','screen-notes'];
+  const totalSteps = 6; // excluding intro and notes
+
+  function goTo(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    const el = document.getElementById(id);
+    el.classList.add('active', 'screen-fade-enter');
+    setTimeout(() => el.classList.remove('screen-fade-enter'), 500);
+
+    const header = document.getElementById('main-header');
+    if (id === 'screen-intro' || id === 'screen-notes') {
+      header.style.display = 'none';
+    } else {
+      header.style.display = 'flex';
+    }
+
+    updateProgress(id);
+    window.scrollTo(0, 0);
+  }
+
+  function updateProgress(id) {
+    const map = {
+      'screen-s1': {step: 1, pct: 17},
+      'screen-s2': {step: 2, pct: 33},
+      'screen-s3': {step: 3, pct: 50},
+      'screen-kc': {step: 4, pct: 67},
+      'screen-results': {step: 6, pct: 100},
+    };
+    const info = map[id];
+    if (info) {
+      document.getElementById('progress-fill').style.width = info.pct + '%';
+      document.getElementById('step-label').textContent = `Step ${info.step} of ${totalSteps}`;
+    }
+  }
+
+  function startModule() {
+    goTo('screen-s1');
+  }
+
+  // ─── SCENARIO 1 ───
+  function chooseS1(choice) {
+    const btns = document.querySelectorAll('#choices-s1 .choice-btn');
+    btns.forEach(b => b.disabled = true);
+
+    const fbEl = document.getElementById('fb-s1');
+    fbEl.classList.add('show');
+
+    if (choice === 'B') {
+      btns[1].classList.add('correct');
+      fbEl.className = 'feedback-box correct-fb show';
+      fbEl.innerHTML = `<div class="feedback-heading">✓ Best Response</div>
+        <p class="feedback-text">Acknowledging Jordan's frustration first creates psychological safety. You're not ignoring the issue — you're prioritising <strong>listening before judging</strong>. This approach aligns with motivational interviewing principles and is far more likely to uncover the real root cause of the problem.</p>`;
+      score += 10;
+    } else if (choice === 'A') {
+      btns[0].classList.add('wrong');
+      btns[1].classList.add('correct');
+      fbEl.className = 'feedback-box wrong-fb show';
+      fbEl.innerHTML = `<div class="feedback-heading">↗ Close, but consider this</div>
+        <p class="feedback-text">Leading with data isn't wrong — but doing so before acknowledging Jordan's emotions is likely to increase defensiveness. The <strong>best practice</strong> is to validate the emotional state first, then work through the specifics together.</p>`;
+    } else {
+      btns[2].classList.add('wrong');
+      btns[1].classList.add('correct');
+      fbEl.className = 'feedback-box wrong-fb show';
+      fbEl.innerHTML = `<div class="feedback-heading">✗ Avoid This Approach</div>
+        <p class="feedback-text">Opening with threats of consequences — especially before understanding the situation — immediately triggers the fight-or-flight response. The employee becomes focused on <strong>self-defence</strong> rather than problem-solving, making a productive conversation nearly impossible.</p>`;
+    }
+
+    document.getElementById('next-s1').style.display = 'inline-flex';
+  }
+
+  // ─── SCENARIO 2 ───
+  function chooseS2(choice) {
+    const btns = document.querySelectorAll('#choices-s2 .choice-btn');
+    btns.forEach(b => b.disabled = true);
+
+    const fbEl = document.getElementById('fb-s2');
+    fbEl.classList.add('show');
+
+    if (choice === 'B') {
+      btns[1].classList.add('correct');
+      fbEl.className = 'feedback-box correct-fb show';
+      fbEl.innerHTML = `<div class="feedback-heading">✓ Best Response</div>
+        <p class="feedback-text">This response demonstrates the crucial distinction between a <strong>skills gap</strong> (can't do) and a <strong>will gap</strong> (won't do). By thanking Jordan for sharing and shifting into problem-solving mode, you signal that the meeting is a safe space — and you address the actual root cause.</p>`;
+      score += 10;
+    } else if (choice === 'A') {
+      btns[0].classList.add('wrong');
+      btns[1].classList.add('correct');
+      fbEl.className = 'feedback-box wrong-fb show';
+      fbEl.innerHTML = `<div class="feedback-heading">✗ Avoid This Approach</div>
+        <p class="feedback-text">Dismissing a structural barrier with "that's not an excuse" destroys trust and misidentifies the problem. <strong>Poor performance due to missing training is an organisational failure</strong>, not just an individual one. Proceeding with consequences would be both unfair and ineffective.</p>`;
+    } else {
+      btns[2].classList.add('wrong');
+      btns[1].classList.add('correct');
+      fbEl.className = 'feedback-box wrong-fb show';
+      fbEl.innerHTML = `<div class="feedback-heading">↗ Misstep — Good Instinct, Wrong Timing</div>
+        <p class="feedback-text">While involving HR may eventually be appropriate, <strong>escalating immediately</strong> — before resolving Jordan's immediate needs — signals that you're more interested in accountability than support. It also risks overwhelming what should be a focused, forward-looking conversation.</p>`;
+    }
+
+    document.getElementById('next-s2').style.display = 'inline-flex';
+  }
+
+  // ─── SCENARIO 3 ───
+  function chooseS3(choice) {
+    const btns = document.querySelectorAll('#choices-s3 .choice-btn');
+    btns.forEach(b => b.disabled = true);
+
+    const fbEl = document.getElementById('fb-s3');
+    fbEl.classList.add('show');
+
+    if (choice === 'B') {
+      btns[1].classList.add('correct');
+      fbEl.className = 'feedback-box correct-fb show';
+      fbEl.innerHTML = `<div class="feedback-heading">✓ Best Response</div>
+        <p class="feedback-text">Co-creating the action list builds <strong>joint ownership</strong> of the outcome — Jordan leaves with clarity on what's expected and feels like an active participant rather than someone who had things done to them. A scheduled follow-up signals you're invested in their success.</p>`;
+      score += 10;
+    } else if (choice === 'A') {
+      btns[0].classList.add('wrong');
+      btns[1].classList.add('correct');
+      fbEl.className = 'feedback-box wrong-fb show';
+      fbEl.innerHTML = `<div class="feedback-heading">✗ Too Vague</div>
+        <p class="feedback-text">Ending without clear agreed actions and a specific follow-up date leaves both parties without accountability. "A few weeks" is ambiguous, and without documentation, it's easy for good intentions to fade. <strong>Clarity at close is what converts good conversations into real change.</strong></p>`;
+    } else {
+      btns[2].classList.add('wrong');
+      btns[1].classList.add('correct');
+      fbEl.className = 'feedback-box wrong-fb show';
+      fbEl.innerHTML = `<div class="feedback-heading">↗ Consider the Impact</div>
+        <p class="feedback-text">Copying HR on a summary — when no formal process has been initiated — signals distrust and can make Jordan feel surveilled rather than supported. A shared action plan between manager and employee is appropriate at this stage; <strong>HR documentation should follow a clear escalation path, not be used as a default.</strong></p>`;
+    }
+
+    document.getElementById('next-s3').style.display = 'inline-flex';
+  }
+
+  // ─── KNOWLEDGE CHECK ───
+  function answerKC(num, choice, result) {
+    const opts = document.querySelectorAll(`#kc${num} .kc-option`);
+    opts.forEach(o => o.disabled = true);
+
+    // Find which button was clicked
+    const letters = ['A','B','C','D'];
+    opts.forEach((opt, i) => {
+      if (letters[i] === choice) {
+        opt.classList.add(result === 'correct' ? 'correct' : 'wrong');
+      } else if (result === 'wrong') {
+        // Find and highlight correct answer
+        // correct answers: kc1=B(idx1), kc2=C(idx2), kc3=B(idx1)
+        const correctIdxMap = {1:1, 2:2, 3:1};
+        if (i === correctIdxMap[num]) opt.classList.add('correct');
+      }
+    });
+
+    const fbEl = document.getElementById(`fb-kc${num}`);
+    fbEl.classList.add('show');
+
+    if (result === 'correct') {
+      kcCorrect++;
+      fbEl.className = 'feedback-box correct-fb show';
+      fbEl.innerHTML = `<div class="feedback-heading">✓ Correct!</div>
+        <p class="feedback-text">${getKCFeedback(num, 'correct')}</p>`;
+    } else {
+      fbEl.className = 'feedback-box wrong-fb show';
+      fbEl.innerHTML = `<div class="feedback-heading">✗ Not quite</div>
+        <p class="feedback-text">${getKCFeedback(num, 'wrong')}</p>`;
+    }
+
+    document.getElementById(`next-kc${num}`).style.display = 'inline-flex';
+    updateKCProgress(num);
+  }
+
+  function updateKCProgress(num) {
+    const pct = 67 + (num * 11);
+    document.getElementById('progress-fill').style.width = pct + '%';
+    document.getElementById('step-label').textContent = `Step ${3 + num} of ${totalSteps}`;
+  }
+
+  function getKCFeedback(num, type) {
+    const fb = {
+      1: {
+        correct: "Open questions in feedback conversations are fundamentally about <strong>information gathering</strong>. You need the employee's perspective to accurately diagnose the situation — without it, you risk prescribing the wrong solution.",
+        wrong: "The correct answer is <strong>B</strong>. Asking open questions lets you hear the employee's perspective before you make assumptions — a foundational principle of effective feedback and coaching."
+      },
+      2: {
+        correct: "Exactly right. A skills gap requires <strong>training and support</strong> — applying performance management consequences to someone who hasn't been given the right tools is both ineffective and unfair.",
+        wrong: "The correct answer is <strong>C</strong>. When the root cause is lack of skills or training (a skills gap), the appropriate response is a development plan — not discipline, reassignment, or inaction."
+      },
+      3: {
+        correct: "Confirming actions together and scheduling a follow-up creates <strong>mutual accountability</strong> — both parties leave knowing exactly what happens next, which is the hallmark of a productive feedback conversation.",
+        wrong: "The correct answer is <strong>B</strong>. Effective meeting closures include a co-created list of next steps and a concrete follow-up date — vague endings undermine the impact of even the best conversations."
+      }
+    };
+    return fb[num][type];
+  }
+
+  function showKC(num) {
+    document.getElementById(`kc${num-1}`).style.display = 'none';
+    const next = document.getElementById(`kc${num}`);
+    next.style.display = 'flex';
+    next.classList.add('screen-fade-enter');
+    setTimeout(() => next.classList.remove('screen-fade-enter'), 500);
+    window.scrollTo(0,0);
+  }
+
+  function goResults() {
+    goTo('screen-results');
+
+    // Animate score ring
+    const totalScore = score + (kcCorrect * 10);
+    const pct = totalScore / 60 * 100;
+    const circumference = 377;
+    const offset = circumference - (circumference * pct / 100);
+
+    setTimeout(() => {
+      const arc = document.getElementById('score-arc');
+      arc.style.transition = 'stroke-dashoffset 1.5s cubic-bezier(0.4,0,0.2,1)';
+      arc.style.strokeDashoffset = offset;
+
+      // Count up score number
+      let displayed = 0;
+      const interval = setInterval(() => {
+        displayed += 2;
+        if (displayed >= totalScore) {
+          displayed = totalScore;
+          clearInterval(interval);
+        }
+        document.getElementById('score-display').textContent = displayed + '%';
+      }, 30);
+    }, 300);
+
+    // Results message
+    const titleEl = document.getElementById('results-title');
+    const msgEl = document.getElementById('results-msg');
+
+    if (totalScore >= 50) {
+      titleEl.textContent = 'Excellent work!';
+      msgEl.innerHTML = `You scored <strong>${totalScore}%</strong> overall. You demonstrated strong understanding of constructive feedback principles — particularly around root-cause analysis and creating psychological safety. You're ready to apply these skills in a real workplace context.`;
+    } else if (totalScore >= 30) {
+      titleEl.textContent = 'Good effort!';
+      msgEl.innerHTML = `You scored <strong>${totalScore}%</strong> overall. You grasped several key concepts, but there are some areas — particularly around distinguishing skills gaps from motivation problems — that would benefit from further review. Consider revisiting Scenes 2 and 3.`;
+    } else {
+      titleEl.textContent = 'Keep practising!';
+      msgEl.innerHTML = `You scored <strong>${totalScore}%</strong> overall. This is a challenging topic! The core principle to revisit is: <strong>listen before you lead</strong>. Try restarting the module and focusing on each feedback explanation before proceeding.`;
+    }
+  }
+
+  function showDesignNotes() {
+    goTo('screen-notes');
+  }
+
+  function restartModule() {
+    score = 0;
+    kcCorrect = 0;
+
+    // Reset all choices
+    ['s1','s2','s3'].forEach(s => {
+      document.querySelectorAll(`#choices-${s} .choice-btn`).forEach(b => {
+        b.disabled = false;
+        b.classList.remove('correct','wrong');
+      });
+      const fb = document.getElementById(`fb-${s}`);
+      fb.className = 'feedback-box';
+      fb.innerHTML = '';
+      document.getElementById(`next-${s}`).style.display = 'none';
+    });
+
+    // Reset KC
+    [1,2,3].forEach(n => {
+      document.querySelectorAll(`#kc${n} .kc-option`).forEach(o => {
+        o.disabled = false;
+        o.classList.remove('correct','wrong');
+      });
+      const fb = document.getElementById(`fb-kc${n}`);
+      fb.className = 'feedback-box';
+      fb.innerHTML = '';
+      document.getElementById(`next-kc${n}`).style.display = 'none';
+    });
+
+    document.getElementById('kc1').style.display = 'flex';
+    document.getElementById('kc2').style.display = 'none';
+    document.getElementById('kc3').style.display = 'none';
+
+    // Reset arc
+    document.getElementById('score-arc').style.transition = 'none';
+    document.getElementById('score-arc').style.strokeDashoffset = '377';
+    document.getElementById('score-display').textContent = '0';
+
+    goTo('screen-intro');
+  }
+</script>
+
+</body>
+</html>
