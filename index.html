@@ -1481,7 +1481,7 @@
           displayed = totalScore;
           clearInterval(interval);
         }
-        document.getElementById('score-display').textContent = displayed + '%';
+        document.getElementById('score-display').textContent = Math.round((displayed / 60) * 100) + '%';
       }, 30);
     }, 300);
 
